@@ -11,6 +11,7 @@ import Footer from "@/components/Footer";
 import CustomCursor from "@/components/CustomCursor";
 import ScrollProgress from "@/components/ScrollProgress";
 import { CookieConsentProvider } from "@/components/CookieConsent";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
@@ -99,6 +100,7 @@ export default function RootLayout({
           <main>{children}</main>
           <Footer />
         </CookieConsentProvider>
+        <SpeedInsights />
       </body>
     </html>
   );

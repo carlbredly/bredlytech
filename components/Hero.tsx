@@ -214,7 +214,7 @@ export default function Hero() {
             Trusted by teams at →
           </p>
           <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
-            {["AIverse.", "Faynme", "Nvoice", "NyouzRadio", "Gruztchik Co."].map(
+            {["AIverse", "Faynme", "Nvoice", "NyouzRadio", "Gruztchik Co"].map(
               (name) => (
                 <span
                   key={name}

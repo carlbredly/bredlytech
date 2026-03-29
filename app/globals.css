@@ -1,0 +1,300 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Design Tokens ─────────────────────────────────────────── */
+:root {
+  --color-bg: #050508;
+  --color-surface: #0D0D14;
+  --color-border: #1A1A2E;
+  --color-blue: #2563EB;
+  --color-blue-glow: #3B82F6;
+  --color-snow: #F8F9FF;
+  --color-muted: #6B7280;
+  --color-dim: #374151;
+}
+
+/* ─── Base Reset ─────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-snow);
+  font-family: var(--font-dm-sans, system-ui, sans-serif);
+  overflow-x: hidden;
+}
+
+/* Persisted from browser preview: margins on App Router shell (InnerLayoutRouter → div.overflow-hidden).
+   If that direct child exists, margins apply there; otherwise the inset is on <main> (Next 14-style tree). */
+main:has(> div.overflow-hidden) > div.overflow-hidden {
+  margin-left: 22px;
+  margin-right: 22px;
+}
+
+main:not(:has(> div.overflow-hidden)) {
+  margin-left: 22px;
+  margin-right: 22px;
+}
+
+/* Hide default cursor for custom cursor on non-touch devices */
+@media (pointer: fine) {
+  body { cursor: none; }
+}
+
+/* ─── Custom Cursor ──────────────────────────────────────────── */
+.cursor-dot {
+  position: fixed;
+  width: 6px;
+  height: 6px;
+  background: var(--color-snow);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%);
+  will-change: left, top;
+  transition: width 0.2s ease, height 0.2s ease, background 0.2s ease;
+}
+
+.cursor-ring {
+  position: fixed;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(248, 249, 255, 0.35);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%);
+  will-change: left, top;
+  transition: width 0.35s ease, height 0.35s ease, border-color 0.3s ease;
+}
+
+.cursor-expand .cursor-dot {
+  width: 10px;
+  height: 10px;
+  background: var(--color-blue-glow);
+}
+
+.cursor-expand .cursor-ring {
+  width: 54px;
+  height: 54px;
+  border-color: rgba(59, 130, 246, 0.45);
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--color-bg); }
+::-webkit-scrollbar-thumb { background: var(--color-blue); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-blue-glow); }
+
+/* ─── Selection ──────────────────────────────────────────────── */
+::selection {
+  background: var(--color-blue);
+  color: #fff;
+}
+
+/* ─── Grain Overlay ──────────────────────────────────────────── */
+.grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 200;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+/* ─── Mesh Gradient Blobs ────────────────────────────────────── */
+.mesh-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* ─── Shimmer Button ─────────────────────────────────────────── */
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 25%,
+    rgba(255, 255, 255, 0.18) 45%,
+    rgba(255, 255, 255, 0.18) 55%,
+    transparent 75%
+  );
+  background-size: 200% 100%;
+  background-position: -200% 0;
+  pointer-events: none;
+}
+
+.btn-shimmer:hover::after {
+  animation: shimmer 0.7s ease-out forwards;
+}
+
+/* ─── Infinite Marquee ───────────────────────────────────────── */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  gap: 24px;
+  animation: marquee 40s linear infinite;
+  will-change: transform;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+/* ─── Form Input ─────────────────────────────────────────────── */
+.input-field {
+  position: relative;
+  width: 100%;
+}
+
+.input-field input,
+.input-field textarea,
+.input-field select {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-dim);
+  color: var(--color-snow);
+  font-family: var(--font-dm-sans, system-ui, sans-serif);
+  font-size: 1rem;
+  padding: 12px 0;
+  outline: none;
+  transition: border-color 0.3s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  border-radius: 0;
+}
+
+.input-field input::placeholder,
+.input-field textarea::placeholder {
+  color: var(--color-dim);
+}
+
+.input-field::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  right: 50%;
+  height: 1px;
+  background: var(--color-blue);
+  transition: left 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.input-field:focus-within::after {
+  left: 0;
+  right: 0;
+}
+
+.input-field label {
+  display: block;
+  font-family: var(--font-jetbrains, monospace);
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-bottom: 4px;
+}
+
+/* ─── Gradient Divider ───────────────────────────────────────── */
+.gradient-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(37, 99, 235, 0.5), transparent);
+}
+
+/* ─── Section Number ─────────────────────────────────────────── */
+.section-number {
+  font-family: var(--font-jetbrains, monospace);
+  font-size: clamp(5rem, 12vw, 10rem);
+  font-weight: 500;
+  color: rgba(37, 99, 235, 0.07);
+  line-height: 1;
+  user-select: none;
+  pointer-events: none;
+  letter-spacing: -0.05em;
+}
+
+/* ─── Bento Card Glow ────────────────────────────────────────── */
+.bento-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background: radial-gradient(
+    circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(37, 99, 235, 0.12) 0%,
+    transparent 60%
+  );
+  pointer-events: none;
+}
+
+.bento-card:hover .bento-glow {
+  opacity: 1;
+}
+
+/* ─── Focus visible ──────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-blue);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ─── Underline Link ─────────────────────────────────────────── */
+.link-hover {
+  position: relative;
+  display: inline-block;
+}
+
+.link-hover::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--color-blue);
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.link-hover:hover::after {
+  width: 100%;
+}
+
+/* ─── Testimonial card border ────────────────────────────────── */
+.testimonial-card {
+  border-left: 2px solid var(--color-blue);
+}
+
+/* ─── Card 3D tilt style ─────────────────────────────────────── */
+.tilt-card {
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}

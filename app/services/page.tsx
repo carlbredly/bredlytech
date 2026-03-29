@@ -2,11 +2,24 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CheckCircle, ArrowRight } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
+import { SITE_URL } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: "Services",
   description:
     "Five disciplines: Web Development, Mobile Apps, SaaS, AI Solutions, UI/UX Design — built for scale.",
+  alternates: { canonical: `${SITE_URL}/services` },
+  openGraph: {
+    title: "Services — Bredly Technologies LLC",
+    description:
+      "Web, mobile, SaaS, AI, and UI/UX — engineered for performance and growth.",
+    url: `${SITE_URL}/services`,
+  },
+  twitter: {
+    title: "Services — Bredly Technologies LLC",
+    description:
+      "Web, mobile, SaaS, AI, and UI/UX — engineered for performance and growth.",
+  },
 };
 
 const services = [

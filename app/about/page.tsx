@@ -2,11 +2,24 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Lightbulb, ShieldCheck, Zap, Award, ArrowRight } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
+import { SITE_URL } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: "About",
   description:
     "Learn about Bredly Technologies LLC — our story, mission, founder Carl Bredly, and the values that drive every project.",
+  alternates: { canonical: `${SITE_URL}/about` },
+  openGraph: {
+    title: "About — Bredly Technologies LLC",
+    description:
+      "Our story, mission, and the values behind every web, SaaS, and AI project.",
+    url: `${SITE_URL}/about`,
+  },
+  twitter: {
+    title: "About — Bredly Technologies LLC",
+    description:
+      "Our story, mission, and the values behind every web, SaaS, and AI project.",
+  },
 };
 
 const values = [

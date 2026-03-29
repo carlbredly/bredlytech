@@ -1,10 +1,76 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import MeshBackground from "./MeshBackground";
+
+// ── Magnetic CTA (raf pour limiter getBoundingClientRect) ───
+interface MagneticLinkProps {
+  href: string;
+  children: ReactNode;
+  className?: string;
+}
+
+function MagneticLink({ href, children, className = "" }: MagneticLinkProps) {
+  const ref = useRef<HTMLAnchorElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    let rafId = 0;
+    let lastEvent: MouseEvent | null = null;
+
+    const apply = () => {
+      rafId = 0;
+      if (!lastEvent) return;
+      const e = lastEvent;
+      lastEvent = null;
+      const rect = el.getBoundingClientRect();
+      const x = (e.clientX - rect.left - rect.width / 2) * 0.28;
+      const y = (e.clientY - rect.top - rect.height / 2) * 0.28;
+      el.style.transform = `translate(${x}px, ${y}px)`;
+    };
+
+    const handleMove = (e: MouseEvent) => {
+      lastEvent = e;
+      if (!rafId) rafId = requestAnimationFrame(apply);
+    };
+
+    const handleLeave = () => {
+      lastEvent = null;
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
+      el.style.transform = "translate(0, 0)";
+    };
+
+    el.addEventListener("mousemove", handleMove);
+    el.addEventListener("mouseleave", handleLeave);
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      el.removeEventListener("mousemove", handleMove);
+      el.removeEventListener("mouseleave", handleLeave);
+    };
+  }, []);
+
+  return (
+    <Link
+      ref={ref}
+      href={href}
+      className={className}
+      style={{
+        transition:
+          "transform 0.4s cubic-bezier(0.16,1,0.3,1), background 0.2s, color 0.2s",
+      }}
+    >
+      {children}
+    </Link>
+  );
+}
 
 // ── Word-by-word text reveal ─────────────────────────────────
 interface WordRevealProps {
@@ -42,55 +108,11 @@ function WordReveal({
   );
 }
 
-// ── Magnetic CTA Button ──────────────────────────────────────
-interface MagneticLinkProps {
-  href: string;
-  children: React.ReactNode;
-  className?: string;
-}
-
-function MagneticLink({ href, children, className = "" }: MagneticLinkProps) {
-  const ref = useRef<HTMLAnchorElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const handleMove = (e: MouseEvent) => {
-      const rect = el.getBoundingClientRect();
-      const x = (e.clientX - rect.left - rect.width / 2) * 0.28;
-      const y = (e.clientY - rect.top - rect.height / 2) * 0.28;
-      el.style.transform = `translate(${x}px, ${y}px)`;
-    };
-    const handleLeave = () => {
-      el.style.transform = "translate(0, 0)";
-    };
-
-    el.addEventListener("mousemove", handleMove);
-    el.addEventListener("mouseleave", handleLeave);
-    return () => {
-      el.removeEventListener("mousemove", handleMove);
-      el.removeEventListener("mouseleave", handleLeave);
-    };
-  }, []);
-
-  return (
-    <Link
-      ref={ref}
-      href={href}
-      className={className}
-      style={{ transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1), background 0.2s, color 0.2s" }}
-    >
-      {children}
-    </Link>
-  );
-}
-
 // ── Hero ─────────────────────────────────────────────────────
 export default function Hero() {
   return (
     <section
-      className="relative min-h-[100svh] flex flex-col items-center justify-center overflow-hidden pt-16"
+      className="relative isolate min-h-[100svh] flex flex-col items-center justify-center overflow-hidden pt-16"
       aria-label="Hero"
     >
       {/* Animated mesh gradient */}

@@ -47,39 +47,39 @@ main:not(:has(> div.overflow-hidden)) {
   margin-right: 22px;
 }
 
-/* Hide default cursor for custom cursor on non-touch devices */
-@media (pointer: fine) {
+/* Hide default cursor only when custom cursor is active (voir CustomCursor.tsx) */
+@media (pointer: fine) and (prefers-reduced-motion: no-preference) {
   body { cursor: none; }
 }
 
 /* ─── Custom Cursor ──────────────────────────────────────────── */
 .cursor-dot {
   position: fixed;
+  left: 0;
+  top: 0;
   width: 6px;
   height: 6px;
   background: var(--color-snow);
   border-radius: 50%;
   pointer-events: none;
   z-index: 9999;
-  top: 0;
-  left: 0;
-  transform: translate(-50%, -50%);
-  will-change: left, top;
+  transform: translate3d(0, 0, 0) translate(-50%, -50%);
+  will-change: transform;
   transition: width 0.2s ease, height 0.2s ease, background 0.2s ease;
 }
 
 .cursor-ring {
   position: fixed;
+  left: 0;
+  top: 0;
   width: 36px;
   height: 36px;
   border: 1px solid rgba(248, 249, 255, 0.35);
   border-radius: 50%;
   pointer-events: none;
   z-index: 9998;
-  top: 0;
-  left: 0;
-  transform: translate(-50%, -50%);
-  will-change: left, top;
+  transform: translate3d(0, 0, 0) translate(-50%, -50%);
+  will-change: transform;
   transition: width 0.35s ease, height 0.35s ease, border-color 0.3s ease;
 }
 
@@ -118,13 +118,23 @@ main:not(:has(> div.overflow-hidden)) {
   background-size: 200px 200px;
 }
 
-/* ─── Mesh Gradient Blobs ────────────────────────────────────── */
+/* ─── Mesh Gradient Blobs — dégradés radiaux uniquement (pas de filter: blur) */
+.mesh-bg-root {
+  isolation: isolate;
+}
+
 .mesh-blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(90px);
   pointer-events: none;
+  transform: translateZ(0);
   will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mesh-blob {
+    animation: none !important;
+  }
 }
 
 /* ─── Shimmer Button ─────────────────────────────────────────── */

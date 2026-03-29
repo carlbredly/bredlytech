@@ -42,19 +42,20 @@ const config: Config = {
         "line-expand": "lineExpand 0.3s ease-out forwards",
       },
       keyframes: {
+        /* Pas de scale sur les blobs floutés = beaucoup moins de recalcul compositeur */
         mesh1: {
-          "0%, 100%": { transform: "translate(0%, 0%) scale(1)" },
-          "33%": { transform: "translate(8%, -8%) scale(1.12)" },
-          "66%": { transform: "translate(-4%, 6%) scale(0.93)" },
+          "0%, 100%": { transform: "translate(0%, 0%)" },
+          "33%": { transform: "translate(8%, -8%)" },
+          "66%": { transform: "translate(-4%, 6%)" },
         },
         mesh2: {
-          "0%, 100%": { transform: "translate(0%, 0%) scale(1)" },
-          "33%": { transform: "translate(-6%, 10%) scale(1.08)" },
-          "66%": { transform: "translate(10%, -4%) scale(0.96)" },
+          "0%, 100%": { transform: "translate(0%, 0%)" },
+          "33%": { transform: "translate(-6%, 10%)" },
+          "66%": { transform: "translate(10%, -4%)" },
         },
         mesh3: {
-          "0%, 100%": { transform: "translate(0%, 0%) scale(1)" },
-          "50%": { transform: "translate(4%, 4%) scale(1.06)" },
+          "0%, 100%": { transform: "translate(0%, 0%)" },
+          "50%": { transform: "translate(4%, 4%)" },
         },
         marquee: {
           "0%": { transform: "translateX(0)" },

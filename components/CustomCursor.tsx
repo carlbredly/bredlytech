@@ -5,69 +5,108 @@ import { useEffect, useRef, useState } from "react";
 const INTERACTIVE_SEL =
   "a, button, [role='button'], input, textarea, select, label";
 
+/** Seuil en px² : en dessous, l’anneau est considéré aligné → plus de rAF (évite ~60 appels/s en continu). */
+const RING_STOP_EPS2 = 0.36;
+
+function setCursorTransform(el: HTMLDivElement | null, x: number, y: number) {
+  if (!el) return;
+  el.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
+}
+
+function eventTargetToElement(t: EventTarget | null): Element | null {
+  if (t instanceof Element) return t;
+  if (t instanceof Text && t.parentElement) return t.parentElement;
+  return null;
+}
+
 export default function CustomCursor() {
   const dotRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
   const mouse = useRef({ x: 0, y: 0 });
   const ring = useRef({ x: 0, y: 0 });
   const rafRef = useRef<number>(0);
+  const cursorExpandedRef = useRef(false);
+  const lastHitRef = useRef<Element | null>(null);
+  const ringInitializedRef = useRef(false);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    // Only activate on non-touch devices
     if (window.matchMedia("(pointer: coarse)").matches) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     setVisible(true);
 
     const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
+    const scheduleRingTick = () => {
+      if (rafRef.current !== 0) return;
+      if (document.visibilityState === "hidden") return;
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    const tick = () => {
+      if (document.visibilityState === "hidden") {
+        rafRef.current = 0;
+        return;
+      }
+
+      const { x, y } = mouse.current;
+      ring.current.x = lerp(ring.current.x, x, 0.38);
+      ring.current.y = lerp(ring.current.y, y, 0.38);
+      setCursorTransform(ringRef.current, ring.current.x, ring.current.y);
+
+      const dx = x - ring.current.x;
+      const dy = y - ring.current.y;
+      if (dx * dx + dy * dy > RING_STOP_EPS2) {
+        rafRef.current = requestAnimationFrame(tick);
+      } else {
+        rafRef.current = 0;
+      }
+    };
+
     const onMouseMove = (e: MouseEvent) => {
-      mouse.current = { x: e.clientX, y: e.clientY };
-      if (dotRef.current) {
-        dotRef.current.style.left = `${e.clientX}px`;
-        dotRef.current.style.top = `${e.clientY}px`;
+      const x = e.clientX;
+      const y = e.clientY;
+      mouse.current.x = x;
+      mouse.current.y = y;
+      lastHitRef.current = eventTargetToElement(e.target);
+
+      setCursorTransform(dotRef.current, x, y);
+
+      if (!ringInitializedRef.current) {
+        ring.current.x = x;
+        ring.current.y = y;
+        setCursorTransform(ringRef.current, x, y);
+        ringInitializedRef.current = true;
+      }
+
+      const hit = lastHitRef.current;
+      const nextExpand = !!(hit && hit.closest(INTERACTIVE_SEL));
+      if (nextExpand !== cursorExpandedRef.current) {
+        cursorExpandedRef.current = nextExpand;
+        document.body.classList.toggle("cursor-expand", nextExpand);
+      }
+
+      scheduleRingTick();
+    };
+
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden" && rafRef.current !== 0) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = 0;
       }
     };
 
-    const animateRing = () => {
-      ring.current.x = lerp(ring.current.x, mouse.current.x, 0.1);
-      ring.current.y = lerp(ring.current.y, mouse.current.y, 0.1);
-      if (ringRef.current) {
-        ringRef.current.style.left = `${ring.current.x}px`;
-        ringRef.current.style.top = `${ring.current.y}px`;
-      }
-      rafRef.current = requestAnimationFrame(animateRing);
-    };
-
-    /** Capture delegation: avoids stacking mouseenter/mouseleave on every DOM mutation (Framer, etc.). */
-    const onMouseOverCapture = (e: MouseEvent) => {
-      if (!(e.target instanceof Element)) return;
-      if (e.target.closest(INTERACTIVE_SEL)) {
-        document.body.classList.add("cursor-expand");
-      }
-    };
-
-    const onMouseOutCapture = (e: MouseEvent) => {
-      const t = e.target;
-      if (!(t instanceof Element)) return;
-      const rel = e.relatedTarget;
-      if (rel instanceof Node && t.contains(rel)) return;
-      const boundary = t.closest(INTERACTIVE_SEL);
-      if (!boundary) return;
-      if (rel instanceof Node && boundary.contains(rel)) return;
-      document.body.classList.remove("cursor-expand");
-    };
-
-    window.addEventListener("mousemove", onMouseMove);
-    document.addEventListener("mouseover", onMouseOverCapture, true);
-    document.addEventListener("mouseout", onMouseOutCapture, true);
-    rafRef.current = requestAnimationFrame(animateRing);
+    window.addEventListener("mousemove", onMouseMove, { passive: true });
+    document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
-      document.removeEventListener("mouseover", onMouseOverCapture, true);
-      document.removeEventListener("mouseout", onMouseOutCapture, true);
-      cancelAnimationFrame(rafRef.current);
+      document.removeEventListener("visibilitychange", onVisibility);
+      if (rafRef.current !== 0) cancelAnimationFrame(rafRef.current);
+      rafRef.current = 0;
+      cursorExpandedRef.current = false;
+      ringInitializedRef.current = false;
       document.body.classList.remove("cursor-expand");
     };
   }, []);

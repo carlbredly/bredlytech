@@ -1,4 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import JsonLd from "@/components/JsonLd";
+import {
+  SITE_URL,
+  SITE_DESCRIPTION,
+  OG_SHARE_IMAGE_PATH,
+} from "@/lib/site-config";
 import {
   Instrument_Serif,
   Playfair_Display,
@@ -43,12 +49,12 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Bredly Technologies LLC — Software & AI Agency",
     template: "%s | Bredly Technologies",
   },
-  description:
-    "We build powerful software and AI solutions for modern businesses. Custom web apps, SaaS platforms, and digital experiences that scale.",
+  description: SITE_DESCRIPTION,
   keywords: [
     "software agency",
     "web development",
@@ -58,23 +64,43 @@ export const metadata: Metadata = {
     "UI/UX design",
     "Bredly Technologies",
   ],
-  authors: [{ name: "Bredly Technologies LLC" }],
+  authors: [{ name: "Bredly Technologies LLC", url: SITE_URL }],
   creator: "Bredly Technologies LLC",
+  publisher: "Bredly Technologies LLC",
+  formatDetection: { email: false, address: false, telephone: false },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://bredlytech.com",
+    url: SITE_URL,
     siteName: "Bredly Technologies LLC",
     title: "Bredly Technologies LLC — Software & AI Agency",
     description:
       "Custom web apps, SaaS platforms, and AI-powered experiences that scale.",
+    images: [
+      {
+        url: OG_SHARE_IMAGE_PATH,
+        width: 1200,
+        height: 630,
+        alt: "Bredly Technologies LLC",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Bredly Technologies LLC — Software & AI Agency",
-    creator: "@bredlytech",
+    description:
+      "Custom web apps, SaaS platforms, and AI-powered experiences that scale.",
+    creator: "@carlbredlyai",
+    images: [OG_SHARE_IMAGE_PATH],
   },
   robots: { index: true, follow: true },
+  category: "technology",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#050508",
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
@@ -88,6 +114,7 @@ export default function RootLayout({
       className={`${instrumentSerif.variable} ${playfair.variable} ${dmSans.variable} ${jetbrains.variable}`}
     >
       <body className="bg-bg text-snow font-sans antialiased">
+        <JsonLd />
         {/* Noise grain overlay */}
         <div className="grain" aria-hidden="true" />
         {/* Custom cursor (desktop only) */}

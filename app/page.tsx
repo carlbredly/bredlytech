@@ -12,11 +12,19 @@ import ServiceBento from "@/components/ServiceBento";
 import ProjectCard from "@/components/ProjectCard";
 import Marquee from "@/components/Marquee";
 import ScrollReveal from "@/components/ScrollReveal";
+import { SITE_URL } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: "Bredly Technologies LLC — Software & AI Agency",
   description:
     "We build powerful software and AI solutions for modern businesses. Custom web apps, SaaS platforms, and digital experiences that scale.",
+  alternates: { canonical: SITE_URL },
+  openGraph: {
+    url: SITE_URL,
+    title: "Bredly Technologies LLC — Software & AI Agency",
+    description:
+      "Custom web apps, SaaS platforms, and digital experiences that scale.",
+  },
 };
 
 const whyUs = [

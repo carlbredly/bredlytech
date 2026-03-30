@@ -1,5 +1,6 @@
 import "server-only";
 import { Resend } from "resend";
+import { parseNotifyEmails } from "@/lib/contact-channels-status";
 
 function escapeHtml(s: string): string {
   return s
@@ -26,17 +27,17 @@ export async function sendContactNotificationEmail(
   payload: ContactEmailPayload
 ): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
-  const to = process.env.CONTACT_NOTIFY_EMAIL?.trim();
+  const toList = parseNotifyEmails(process.env.CONTACT_NOTIFY_EMAIL);
   const from =
     process.env.RESEND_FROM_EMAIL?.trim() ||
     "Bredly <onboarding@resend.dev>";
 
-  if (!apiKey || !to) {
+  if (!apiKey || toList.length === 0) {
     if (!apiKey) {
       console.warn("[resend] RESEND_API_KEY absent — e-mail non envoyé.");
-    } else if (!to) {
+    } else if (toList.length === 0) {
       console.warn(
-        "[resend] CONTACT_NOTIFY_EMAIL absent — e-mail non envoyé."
+        "[resend] CONTACT_NOTIFY_EMAIL absent ou invalide — e-mail non envoyé."
       );
     }
     return;
@@ -73,7 +74,7 @@ export async function sendContactNotificationEmail(
 
   const { error } = await resend.emails.send({
     from,
-    to: [to],
+    to: toList,
     replyTo: payload.email,
     subject,
     text,

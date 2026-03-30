@@ -6,6 +6,7 @@ import { ADMIN_SESSION_COOKIE_NAME } from "@/lib/admin-cookie-name";
 import { verifyAdminSession } from "@/lib/admin-session";
 import { listContactSubmissions } from "@/lib/contacts";
 import LogoutButton from "./LogoutButton";
+import ContactChannelsBanner from "./ContactChannelsBanner";
 
 export const dynamic = "force-dynamic";
 
@@ -55,10 +56,10 @@ export default async function AdminContactsPage() {
             Admin
           </p>
           <h1 className="font-serif text-3xl font-bold text-snow tracking-tight">
-            Messages contact
+            Tableau de bord — Messages contact
           </h1>
           <p className="mt-1 font-sans text-sm text-muted">
-            {rows.length} message{rows.length !== 1 ? "s" : ""}
+            {rows.length} message{rows.length !== 1 ? "s" : ""} (Supabase)
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -72,6 +73,8 @@ export default async function AdminContactsPage() {
           <LogoutButton />
         </div>
       </div>
+
+      <ContactChannelsBanner />
 
       {rows.length === 0 ? (
         <div className="rounded-2xl border border-edge bg-surface/50 p-12 text-center">

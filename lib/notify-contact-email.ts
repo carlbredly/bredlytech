@@ -44,7 +44,7 @@ export async function sendContactNotificationEmail(
   }
 
   const resend = new Resend(apiKey);
-  const subject = `New Client`;
+  const subject = ``;
 
   const text = buildContactNotificationText(payload);
   const html = buildContactNotificationHtml(payload);

@@ -34,6 +34,7 @@ export default function ContactPage() {
   const [form, setForm] = useState<FormData>(initialData);
   const [errors, setErrors] = useState<Partial<FormData>>({});
   const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const validate = (): boolean => {
     const e: Partial<FormData> = {};
@@ -63,10 +64,40 @@ export default function ContactPage() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
+    setSubmitError(null);
     setStatus("loading");
-    await new Promise((r) => setTimeout(r, 1500));
-    setStatus("success");
-    setForm(initialData);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name.trim(),
+          email: form.email.trim(),
+          company: form.company.trim(),
+          projectType: form.projectType,
+          message: form.message.trim(),
+        }),
+      });
+      const data = (await res.json().catch(() => ({}))) as {
+        error?: string;
+      };
+      if (!res.ok) {
+        setStatus("idle");
+        if (data.error === "save_failed") {
+          setSubmitError(
+            "Envoi impossible pour le moment. Réessayez plus tard ou écrivez-nous par email."
+          );
+        } else {
+          setSubmitError("Vérifiez les champs et réessayez.");
+        }
+        return;
+      }
+      setStatus("success");
+      setForm(initialData);
+    } catch {
+      setStatus("idle");
+      setSubmitError("Erreur réseau. Vérifiez votre connexion.");
+    }
   };
 
   return (
@@ -212,8 +243,12 @@ export default function ContactPage() {
                       and respond within 24 hours.
                     </p>
                     <button
-                      onClick={() => setStatus("idle")}
-                        className="font-mono text-[10px] uppercase tracking-widest text-muted border border-edge rounded-xl px-6 py-3 hover:text-snow hover:border-accent/40 transition-all duration-200"
+                      type="button"
+                      onClick={() => {
+                        setStatus("idle");
+                        setSubmitError(null);
+                      }}
+                      className="font-mono text-[10px] uppercase tracking-widest text-muted border border-edge rounded-xl px-6 py-3 hover:text-snow hover:border-accent/40 transition-all duration-200"
                     >
                       Send Another Message
                     </button>
@@ -229,6 +264,14 @@ export default function ContactPage() {
                     aria-label="Contact form"
                     className="space-y-10"
                   >
+                    {submitError && (
+                      <p
+                        className="font-sans text-sm text-red-400 border border-red-400/25 bg-red-400/5 rounded-xl px-4 py-3"
+                        role="alert"
+                      >
+                        {submitError}
+                      </p>
+                    )}
                     {/* Row 1: Name + Email */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                       {/* Name */}

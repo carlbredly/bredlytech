@@ -55,3 +55,30 @@ export async function listContactSubmissions(): Promise<ContactSubmissionRow[]> 
   }
   return (data ?? []) as ContactSubmissionRow[];
 }
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export async function deleteContactSubmission(
+  id: string
+): Promise<
+  { ok: true } | { ok: false; error: "invalid_id" | "server_config" | "delete_failed" }
+> {
+  const trimmed = id.trim();
+  if (!UUID_RE.test(trimmed)) {
+    return { ok: false, error: "invalid_id" };
+  }
+  if (!isSupabaseConfigured()) {
+    return { ok: false, error: "server_config" };
+  }
+  const supabase = getSupabaseAdmin();
+  const { error } = await supabase
+    .from("contact_submissions")
+    .delete()
+    .eq("id", trimmed);
+  if (error) {
+    console.error("[contact] delete error", error.message);
+    return { ok: false, error: "delete_failed" };
+  }
+  return { ok: true };
+}

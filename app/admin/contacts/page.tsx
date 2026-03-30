@@ -7,6 +7,7 @@ import { verifyAdminSession } from "@/lib/admin-session";
 import { listContactSubmissions } from "@/lib/contacts";
 import LogoutButton from "./LogoutButton";
 import ContactChannelsBanner from "./ContactChannelsBanner";
+import DeleteContactButton from "./DeleteContactButton";
 
 export const dynamic = "force-dynamic";
 
@@ -111,8 +112,8 @@ export default async function AdminContactsPage() {
               key={row.id}
               className="rounded-2xl border border-edge bg-surface p-6 md:p-8"
             >
-              <div className="flex flex-wrap items-baseline justify-between gap-2 mb-4">
-                <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+                <div className="flex flex-wrap items-center gap-2 min-w-0">
                   <span className="font-serif text-lg font-semibold text-snow">
                     {row.name}
                   </span>
@@ -123,12 +124,15 @@ export default async function AdminContactsPage() {
                     {row.email}
                   </a>
                 </div>
-                <time
-                  className="font-mono text-[10px] text-dim shrink-0"
-                  dateTime={row.created_at}
-                >
-                  {formatDate(row.created_at)}
-                </time>
+                <div className="flex items-center gap-3 shrink-0 ml-auto">
+                  <time
+                    className="font-mono text-[10px] text-dim"
+                    dateTime={row.created_at}
+                  >
+                    {formatDate(row.created_at)}
+                  </time>
+                  <DeleteContactButton id={row.id} />
+                </div>
               </div>
               <div className="flex flex-wrap gap-2 mb-4">
                 {row.company ? (

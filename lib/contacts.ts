@@ -1,5 +1,5 @@
 import "server-only";
-import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { getSupabaseAdmin, isSupabaseConfigured } from "@/lib/supabase/admin";
 
 export interface ContactSubmissionRow {
   id: string;
@@ -18,6 +18,12 @@ export async function insertContactSubmission(input: {
   projectType: string;
   message: string;
 }): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (!isSupabaseConfigured()) {
+    console.error(
+      "[contact] Supabase non configuré : définir NEXT_PUBLIC_SUPABASE_URL et SUPABASE_SERVICE_ROLE_KEY (ex. Vercel → Settings → Environment Variables)."
+    );
+    return { ok: false, error: "server_config" };
+  }
   const supabase = getSupabaseAdmin();
   const { error } = await supabase.from("contact_submissions").insert({
     name: input.name,
@@ -34,6 +40,9 @@ export async function insertContactSubmission(input: {
 }
 
 export async function listContactSubmissions(): Promise<ContactSubmissionRow[]> {
+  if (!isSupabaseConfigured()) {
+    throw new Error("supabase_not_configured");
+  }
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
     .from("contact_submissions")

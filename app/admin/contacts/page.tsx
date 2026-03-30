@@ -30,13 +30,34 @@ export default async function AdminContactsPage() {
   let rows;
   try {
     rows = await listContactSubmissions();
-  } catch {
+  } catch (err) {
+    const missingEnv =
+      err instanceof Error && err.message === "supabase_not_configured";
     return (
       <div className="max-w-4xl mx-auto px-6 py-16">
-        <p className="text-muted font-sans text-sm">
-          Impossible de charger les messages. Vérifiez la configuration Supabase
-          (variables d&apos;environnement et table{" "}
-          <code className="text-accent">contact_submissions</code>).
+        <p className="text-muted font-sans text-sm mb-4">
+          {missingEnv ? (
+            <>
+              Les variables Supabase ne sont pas définies sur ce déploiement.
+              Sur <strong className="text-snow">Vercel</strong> : Project →
+              Settings → Environment Variables → ajoutez{" "}
+              <code className="text-accent text-[11px]">
+                NEXT_PUBLIC_SUPABASE_URL
+              </code>{" "}
+              et{" "}
+              <code className="text-accent text-[11px]">
+                SUPABASE_SERVICE_ROLE_KEY
+              </code>{" "}
+              (comme dans <code className="text-dim">.env.local</code>), puis
+              redéployez.
+            </>
+          ) : (
+            <>
+              Impossible de charger les messages. Vérifiez la table{" "}
+              <code className="text-accent">contact_submissions</code> et les
+              clés Supabase.
+            </>
+          )}
         </p>
         <Link
           href="/admin/login"

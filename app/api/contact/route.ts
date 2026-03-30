@@ -61,13 +61,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: result.error }, { status: 503 });
   }
 
-  await sendContactNotificationEmail({
+  const emailResult = await sendContactNotificationEmail({
     name,
     email,
     company,
     projectType,
     message,
   });
+
+  if (emailResult.outcome === "failed") {
+    console.error(
+      "[api/contact] Supabase OK mais Resend a refusé / échoué:",
+      emailResult.message
+    );
+  }
 
   return NextResponse.json({ ok: true });
 }

@@ -83,7 +83,11 @@ export default function ContactPage() {
       };
       if (!res.ok) {
         setStatus("idle");
-        if (data.error === "save_failed") {
+        if (data.error === "server_config") {
+          setSubmitError(
+            "Le service est mal configuré côté serveur. Contactez l’administrateur du site (variables Supabase sur l’hébergeur)."
+          );
+        } else if (data.error === "save_failed") {
           setSubmitError(
             "Envoi impossible pour le moment. Réessayez plus tard ou écrivez-nous par email."
           );

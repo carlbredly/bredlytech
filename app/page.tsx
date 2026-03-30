@@ -215,13 +215,14 @@ export default function HomePage() {
           </ScrollReveal>
 
           <div className="relative -mx-6 md:mx-auto md:w-[839px] md:max-w-full">
+            {/* Fades latéraux mobile : gradient long et sans stop « via » pour éviter les bandes dures */}
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-y-0 left-0 z-[2] w-14 bg-gradient-to-r from-bg via-bg/90 to-transparent md:hidden"
+              className="pointer-events-none absolute inset-y-0 left-0 z-[2] w-12 md:hidden bg-[linear-gradient(90deg,var(--color-bg),transparent)]"
             />
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-y-0 right-0 z-[2] w-14 bg-gradient-to-l from-bg via-bg/90 to-transparent md:hidden"
+              className="pointer-events-none absolute inset-y-0 right-0 z-[2] w-12 md:hidden bg-[linear-gradient(270deg,var(--color-bg),transparent)]"
             />
             <div
               className="flex flex-nowrap gap-4 overflow-x-auto md:overflow-x-visible overscroll-x-contain snap-x snap-mandatory md:snap-none min-h-[155px] w-full max-w-full px-6 pb-2 md:px-0 md:pb-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"

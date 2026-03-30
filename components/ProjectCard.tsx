@@ -93,12 +93,11 @@ export default function ProjectCard({
         <div className="relative aspect-[16/9] overflow-hidden bg-bg">
           {/* Grid texture */}
           <div
-            className="absolute inset-0"
+            className="absolute inset-0 max-md:opacity-[0.12] md:opacity-25"
             style={{
               backgroundImage:
                 "linear-gradient(rgba(37,99,235,0.1) 1px, transparent 1px), linear-gradient(to right, rgba(37,99,235,0.1) 1px, transparent 1px)",
               backgroundSize: "32px 32px",
-              opacity: 0.25,
             }}
             aria-hidden="true"
           />
@@ -109,7 +108,7 @@ export default function ProjectCard({
             </span>
           </div>
           {/* Hover overlay with CTA — lien en z-[3] + pointer-events-auto pour clic fiable */}
-          <div className="absolute inset-0 z-[1] bg-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none group-hover:pointer-events-auto max-md:opacity-100 max-md:pointer-events-auto max-md:bg-accent/5">
+          <div className="absolute inset-0 z-[1] bg-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none group-hover:pointer-events-auto max-md:opacity-100 max-md:pointer-events-auto max-md:bg-transparent">
             {href ? (
               isInternalAppPath(resolvedHref) ? (
                 <Link

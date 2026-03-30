@@ -30,7 +30,7 @@ export async function sendContactNotificationEmail(
   const toList = parseNotifyEmails(process.env.CONTACT_NOTIFY_EMAIL);
   const from =
     process.env.RESEND_FROM_EMAIL?.trim() ||
-    "Bredly <onboarding@resend.dev>";
+    "Bredly Technologies LLC <onboarding@resend.dev>";
 
   if (!apiKey || toList.length === 0) {
     if (!apiKey) {
@@ -44,7 +44,7 @@ export async function sendContactNotificationEmail(
   }
 
   const resend = new Resend(apiKey);
-  const subject = `Nouveau message — ${payload.name}`;
+  const subject = `New Client`;
 
   const text = buildContactNotificationText(payload);
   const html = buildContactNotificationHtml(payload);
